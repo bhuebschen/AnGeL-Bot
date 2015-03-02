@@ -1,0 +1,120 @@
+======================================= EASY STUFF =======================================
+
+NETWORK=euIRCnet WATCH=128 SAFELIST PREFIX=(qaohv)*!@%+ CHANMODES=bewI,k,flBL,cimnprstACHKNOQRSVWXY CHANTYPES=#&+ KICKLEN=307 KNOCK MAP MAXBANS=60 MODES=6 NICKLEN=30 SILENCE=5 TOPICLEN=307 WALLCHOPS MAXCHANNELS=20 MAXTARGETS=20 are available on this server
+
+befehl hinzufügen, mit dem die idlezeit eines users im chan (zurück-)gesetzt werden kann
+
+=================================== INTERMEDIATE STUFF ===================================
+
+<DFrank> hippo: wenn auf |Killer| vom script SENTINEL eine note an mich erstellt wird, die wegen notes-forwarding an cloud weitergeleitet wird, wird die note von sabbel angeblockt
+
+Setting im Botsetup, mit dem man das Logging verstellen kann
+
+addresolve
+
+<Killer07> wenn z.b. ftplist.sdb ankommt solls ins verzeichniss sitedatabase umgeleitet werden
+
+[20:07:42] <Phantom`> ari: ich hab nen wunsch fuer den angel :)
+[20:08:36] <Phantom`> die floot protection is ja schoen und gut nur sollte man die ban mask selber einstellen koennen so das er nicht immer *!*ident@*.host.tld bannt
+[20:08:50] <Phantom`> oder das man den ban auch ganz abschalten kann
+
+======================================= HARD STUFF =======================================
+
+ToBan SentBan:<removetime> Banned
+ToOp SentOp:<removetime> Opped
+ToVoice SentVoice:<removetime> Voiced
+ToExempt SentExempt:<removetime> Exempted
+ToDeop SentDeop:<removetime>
+ToKick SentKick:<removetime>
+
+chankeys merken (die letzten 3 zum beispiel)
+
+socks4/5 passwort
+
+<|^AnGeL^|>  ,%%',%%',%%',%%'                                '%%,'%%,'%%,'%%,
+<|^AnGeL^|> ,%%',%%',%%',%%'  AnGeL Party Line Version 1.5.7  '%%,'%%,'%%,'%%,
+<|^AnGeL^|>  ,%%',%%',%%',%%'                                '%%,'%%,'%%,'%%,
+
+<|^AnGeL^|> 9) Channel protection
+<|^AnGeL^|>    Here are the possible values for this setting:
+<|^AnGeL^|>    '0': No protection.
+<|^AnGeL^|>    '1': Deop unknown users. Exception: Don't deop them if
+<|^AnGeL^|>         they got opped by bots or owners.
+<|^AnGeL^|>    '2': Same as (1), but also deop users without '+o' flag.
+<|^AnGeL^|>    '3': Deop all unknown users, even if they got opped by
+<|^AnGeL^|>         bots or owners.
+<|^AnGeL^|>    '4': Same as (3), but also deop users without '+o' flag.
+
+======================================== THE REST ========================================
+
+r psylocke |^AnGeL^| 
+
+standard ist immer +fp... ich nehm das mit in meine optionalen configfile-settings auf
+
+<Hippo> daß man per /msg |^angel^| away bin mal essen
+<Hippo> eingeben kann
+<alexkid> oder das
+<Hippo> und dann bei !seen test kommt
+<alexkid> jap, das wärs
+<Hippo> "test has left #smof just moments ago! (away: bin mal essen)"
+<Hippo> "You still have an away message set. To delete it, type: /msg |^AnGeL^| back"
+
+unban-delay einstellen
+
+nick regaining verbessern!...
+
+<HotaruT> mach doch so: /msg bot identcmd pw [nick|123] wobei 1 *!ident@*.toplevel, 2 *!*ident@*.subdomain.toplevel.de etc. ist
+
+<Hippo> ich bau einfach einen PermOwner=<nick> eintrag ins configfile ein
+<SailorM_> genau das meinte ich
+<Hippo> an dessen flags kann niemand was ändern, es kann niemand eine hostmask nehmen, die eine von seinen matcht und man kann ihn nicht booten
+
+<P-chan> ne begrenzung im sinne von "soviel MB gebe ich für die file area frei"
+
+<Hippo> -> .kickban <nick/hostmask> (#channel)
+<Hippo> dann kann man z.b. auch *!*@*.t-online.de kicken lassen
+
+<Hippo> remote boots.
+<Hippo> ...im botsetup abschaltbar.
+
+richtig: j gatecrash testuser A *I me@my.com
+<St4X> 1. AnGeL BotNet ERROR (17.06.99, 22:41): Der Fehler 0 () ist beim Bearbeiten folgender Zeile aufgetreten (1408): 1408 - j gatecrash bla fd@f.de
+
+<|^AnGeL^|> 7. Andreas_N (30.05.99, 00:54): außerdem wäre es gut wenn z.b. mit ".bans #smof" nur die channelbans angezeigt würden
+<|^AnGeL^|> 8. Andreas_N (30.05.99, 00:58): und auch die die nicht im bot stehen aber trotzdem im channel gesetzt sind ... die sollten auch angezeigt werden (so wie das bei den eggdrops ist)
+
+.dump für superowner
+
+'Botsetup:
+
+<Hotaru>  Hostmasks: *!*CoBrAtH@*.01019freenet.de
+<Hotaru>             *!Cobrath@*
+<Hotaru>             *!*Cobrath@*
+                      ^--- verhindern! (sowas wie 'don't allow hostmask types:')
+
+<Hippo> gute idee. ich mach im botsetup "banned flags"
+
+- Masskick bei 2 collides.
+- note forwarding:
+    p 15:Hippo@Salat Hippo@_Shubber_ <trala@Salat Hi, lang nicht mehr gesehen!
+<|^AnGeL^|> [O-YAMA] <L0RE> -> .fwd L0RE L0RE@james^st
+<|^AnGeL^|> [O-YAMA] <L0RE> dan brauch ich die notes nur noch in james lesen
+<|^AnGeL^|> [O-YAMA] <L0RE> und o-yama lest mcih in ruhe :-)
+
+- Dynamic Bans
+
+/msg <bot> note <passwort> <empfänger> <text>
+
+Brech die Zaubermacht und Du hast das Wort,
+halt den Mondstein fest, sonst fliegt er fort,
+du wirst nicht verschont
+von Seglermond!
+
+Knips das Licht schnell an gegen Dunkelheit,
+Ruf den Anwalt an für Gerechtigkeit,
+Von Türken verhöhnt,
+ist Seglermönd!
+
+<to be continued!>
+
+FindFirstChangeNotification

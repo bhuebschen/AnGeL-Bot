@@ -1,0 +1,314 @@
+Option Explicit
+
+' Sharing 'Setup'
+'-——————————————————————————————————————————————————————- -- -  -
+Public Sub EnterSharing(vsock As Long) ' : AddStack "Sharing_EnterSharing(" & vsock & ")"
+  SetAway vsock, "Sharing setup"
+  SetSockFlag vsock, SF_Status, SF_Status_SharingSetup
+  If GetSockFlag(vsock, SF_Colors) = SF_YES Then
+    TU vsock, " 8,0,%0,8%'4,8,%8,4%'5,4,%4,5%'1,5,%5,1%'0,1               5,1'%1,5%,4,5'%5,4%,8,4'%4,8%,0,8'%8,0%,"
+    TU vsock, "8,0,%0,8%'4,8,%8,4%'5,4,%4,5%'1,5,%5,1%'0,1  Sharing setup  5,1'%1,5%,4,5'%5,4%,8,4'%4,8%,0,8'%8,0%,"
+    TU vsock, " 8,0,%0,8%'4,8,%8,4%'5,4,%4,5%'1,5,%5,1%'0,1               5,1'%1,5%,4,5'%5,4%,8,4'%4,8%,0,8'%8,0%,"
+  End If
+End Sub
+
+Public Sub LeaveSharing(vsock As Long) ' : AddStack "Sharing_LeaveSharing(" & vsock & ")"
+  If GetSockFlag(vsock, SF_Status) = SF_Status_SharingSetup Then
+    TU vsock, "10*** Bringing you back to the party line..."
+    SetSockFlag vsock, SF_Status, SF_Status_Party
+    SetAway vsock, ""
+  End If
+End Sub
+
+Public Sub SharingSetup(vsock As Long, Line As String) ' : AddStack "Sharing_SharingSetup(" & vsock & ", " & Line & ")"
+Dim Rest As String, List As String, BegStr As String
+  If Param(Line, 1) = "0" Then
+    LeaveSharing vsock
+    Exit Sub
+  End If
+  List = GetUserData(GetUserNum(DCCSocks(vsock).SetupChan), "sharing", "")
+  Select Case Param(DCCSocks(vsock).CurrentQuestion, 1)
+    Case "FullOrChan"
+      Select Case Param(Line, 1)
+        Case "1"
+          DCCSocks(vsock).CurrentQuestion = "FullShareMethod"
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3When I just got connected to the other bot, how should our"
+          TU vsock, "3userfiles be synchronized?"
+          TU vsock, EmptyLine
+          TU vsock, "  Overwrite one bot's userfile:"
+          TU vsock, "    21) -> Send my userfile to the other bot."
+          TU vsock, "    22) <- Receive userfile and overwrite mine."
+          TU vsock, EmptyLine
+          TU vsock, "  Mix userfile with the other bot:"
+          TU vsock, "    23) -> My userfile entries dominate in conflicts."
+          TU vsock, "    24) <- The other bot's userfile entries dominate."
+          TU vsock, EmptyLine
+          TU vsock, "Please choose a method number (1-4) or enter '0' to cancel."
+        Case "2"
+          DCCSocks(vsock).CurrentQuestion = "ChanShareChannel"
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3Please enter the channel you want to share."
+        Case Else
+          TU vsock, "5Invalid selection!"
+      End Select
+    Case "FullShareMethod"
+      Select Case Param(Line, 1)
+        Case "1", "3"
+          DCCSocks(vsock).CurrentQuestion = "AllowUserfileChange " + Param(Line, 1)
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3Do you want to allow the other bot to change my userfile"
+          TU vsock, "3after the first synchronization has been made?"
+          TU vsock, EmptyLine
+          TU vsock, "  2'YES': Masters and owners of the other bot can modify"
+          TU vsock, "         my users without having to join my party line."
+          TU vsock, "  2'NO' : All changes must be made on *my* party line."
+          TU vsock, "         Userfile changes coming from the other bot will"
+          TU vsock, "         be rejected."
+          TU vsock, EmptyLine
+          TU vsock, "Please choose 'YES' or 'NO' or enter '0' to cancel."
+        Case "2", "4"
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3Thank you. I'm now ready to share with " + DCCSocks(vsock).SetupChan + "."
+          TU vsock, EmptyLine
+          TU vsock, "14.--- 2Sharing summary: 14---------------------------- --- --  -"
+          Select Case Param(Line, 1)
+            Case "2"
+              TU vsock, "14| - On connect, the other bot will overwrite my userfile"
+              TU vsock, "14|   with its own one."
+              TU vsock, "14| - All of my users (except super owners) will be deleted"
+              TU vsock, "14|   and replaced by the other bot's users."
+              Rest = BotNetNick + " 1"
+              List = ModifyList(List, ",", "full", "full 2")
+              SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+            Case "4"
+              TU vsock, "14| - On connect, I will mix my userfile with the other bot."
+              TU vsock, "14|   We both will not lose our current users."
+              TU vsock, "14| - When there are conflicts (i.e. duplicate users), the"
+              TU vsock, "14|   other bot's settings dominate."
+              Rest = BotNetNick + " 3"
+              List = ModifyList(List, ",", "full", "full 4")
+              SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+          End Select
+          TU vsock, "14'------------------------------------------------------ --- --  -"
+          TU vsock, EmptyLine
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3The following command must be executed on the other bot's"
+          TU vsock, "3party line to start sharing:10 .+share " + Rest
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, EmptyLine
+          LeaveSharing vsock
+        Case Else
+          TU vsock, "5Invalid selection!"
+      End Select
+    Case "AllowUserfileChange"
+      Select Case LCase(Param(Line, 1))
+        Case "yes", "no"
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3Thank you. I'm now ready to share with " + DCCSocks(vsock).SetupChan + "."
+          TU vsock, EmptyLine
+          TU vsock, "14.--- 2Sharing summary: 14---------------------------- --- --  -"
+          Select Case LCase(Param(Line, 1))
+            Case "yes"
+              Select Case Param(DCCSocks(vsock).CurrentQuestion, 2)
+                Case "1"
+                  TU vsock, "14| - On connect, I will overwrite the other bot's userfile"
+                  TU vsock, "14|   with my own one. My users won't be changed."
+                  Rest = BotNetNick + " 2"
+                  List = ModifyList(List, ",", "full", "full 1")
+                  SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+                Case "3"
+                  TU vsock, "14| - On connect, I will mix my userfile with the other bot."
+                  TU vsock, "14|   We both will not lose our current users."
+                  TU vsock, "14| - When there are conflicts (i.e. duplicate users),"
+                  TU vsock, "14|   my settings dominate."
+                  Rest = BotNetNick + " 4"
+                  List = ModifyList(List, ",", "full", "full 3")
+                  SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+              End Select
+              TU vsock, "14| - When the connection has been established, masters"
+              TU vsock, "14|   and owners of the other bot can modify my users and"
+              TU vsock, "14|   settings without having to join my party line."
+            Case "no"
+              Select Case Param(DCCSocks(vsock).CurrentQuestion, 2)
+                Case "1"
+                  TU vsock, "14| - On connect, I will overwrite the other bot's userfile"
+                  TU vsock, "14|   with my own one. My users won't be changed."
+                  Rest = BotNetNick + " 2"
+                  List = ModifyList(List, ",", "full", "full 1 block")
+                  SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+                Case "3"
+                  TU vsock, "14| - On connect, I will mix my userfile with the other bot."
+                  TU vsock, "14|   We both will not lose our current users."
+                  TU vsock, "14| - When there are conflicts (i.e. duplicate users),"
+                  TU vsock, "14|   my settings dominate."
+                  Rest = BotNetNick + " 4"
+                  List = ModifyList(List, ",", "full", "full 3 block")
+                  SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+              End Select
+              TU vsock, "14| - The other bot may not change my userfile. All changes"
+              TU vsock, "14|   must be made on my party line."
+          End Select
+          TU vsock, "14'------------------------------------------------------ --- --  -"
+          TU vsock, EmptyLine
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3The following command must be executed on the other bot's"
+          TU vsock, "3party line to start sharing:10 .+share " + Rest
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, EmptyLine
+          LeaveSharing vsock
+        Case Else
+          TU vsock, "5Invalid selection!"
+      End Select
+    Case "ChanShareChannel"
+      If InStr(Line, " ") > 0 Then TU vsock, "5A channel name can't contain spaces.": Exit Sub
+      If InStr(Line, ",") > 0 Then TU vsock, "5A channel name can't contain commas.": Exit Sub
+      If InStr("#&+", Left(Line, 1)) = 0 Then TU vsock, "5The channel name must begin with one of the following characters: #&+": Exit Sub
+      DCCSocks(vsock).CurrentQuestion = "ChanShareMethod " + Line
+      TU vsock, "14----------------- --- --  -"
+      TU vsock, "3What type of channel sharing should be used?"
+      TU vsock, EmptyLine
+      TU vsock, "  One bot controls the other bot's channel settings:"
+      TU vsock, "    21) >> I'm the master. I control the slave's settings."
+      TU vsock, "    22) << I'm the slave. The master overwrites my settings."
+      TU vsock, EmptyLine
+      TU vsock, "  Mix channel settings with the other bot:"
+      TU vsock, "    23) -> My settings dominate in conflicts."
+      TU vsock, "    24) <- The other bot's settings dominate."
+      TU vsock, EmptyLine
+      TU vsock, "Please choose an option (1-4) or enter '0' to cancel."
+    Case "ChanShareMethod"
+      BegStr = "chan " + Param(DCCSocks(vsock).CurrentQuestion, 2)
+      Select Case Param(Line, 1)
+        Case "1", "2", "3", "4"
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3Thank you. I'm now ready to share with " + DCCSocks(vsock).SetupChan + "."
+          TU vsock, EmptyLine
+          TU vsock, "14.--- 2Settings for " + Param(DCCSocks(vsock).CurrentQuestion, 2) + ": 14---------------------------- --- --  -"
+          Select Case Param(Line, 1)
+            Case "1"
+              TU vsock, "14| - I will control the other bot's users and settings for"
+              TU vsock, "14|   this channel."
+              TU vsock, "14| - The other bot may not change my userfile. All changes"
+              TU vsock, "14|   must be made on my party line."
+              Rest = BotNetNick + " " + Param(DCCSocks(vsock).CurrentQuestion, 2) + " 2"
+              List = ModifyList(List, ",", BegStr, BegStr + " 1")
+            Case "2"
+              TU vsock, "14| - My users and settings for this channel will be controlled"
+              TU vsock, "14|   by the other bot."
+              TU vsock, "14| - I can't change the other bot's userfile. All changes"
+              TU vsock, "14|   must be made on the other bot's party line."
+              Rest = BotNetNick + " " + Param(DCCSocks(vsock).CurrentQuestion, 2) + " 1"
+              List = ModifyList(List, ",", BegStr, BegStr + " 2")
+            Case "3"
+              TU vsock, "14| - On connect, I will mix my users and settings for this"
+              TU vsock, "14|   channel with the other bot."
+              TU vsock, "14| - When there are conflicts (i.e. differing flags), my"
+              TU vsock, "14|   settings dominate."
+              TU vsock, "14| - Masters and owners of the other bot can modify my users"
+              TU vsock, "14|   and settings without having to join my party line."
+              Rest = BotNetNick + " " + Param(DCCSocks(vsock).CurrentQuestion, 2) + " 4"
+              List = ModifyList(List, ",", BegStr, BegStr + " 3")
+            Case "4"
+              TU vsock, "14| - On connect, I will mix my users and settings for this"
+              TU vsock, "14|   channel with the other bot."
+              TU vsock, "14| - When there are conflicts (i.e. differing flags), the"
+              TU vsock, "14|   other bot's settings dominate."
+              TU vsock, "14| - My masters and owners can modify the other bot's users"
+              TU vsock, "14|   and settings without having to join its party line."
+              Rest = BotNetNick + " " + Param(DCCSocks(vsock).CurrentQuestion, 2) + " 3"
+              List = ModifyList(List, ",", BegStr, BegStr + " 4")
+          End Select
+          SetUserData GetUserNum(DCCSocks(vsock).SetupChan), "sharing", List
+          TU vsock, "14'------------------------------------------------------ --- --  -"
+          TU vsock, EmptyLine
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, "3The following command must be executed on the other bot's"
+          TU vsock, "3party line to start sharing:10 .+share " + Rest
+          TU vsock, "14----------------- --- --  -"
+          TU vsock, EmptyLine
+          LeaveSharing vsock
+        Case Else
+          TU vsock, "5Invalid selection!"
+      End Select
+  End Select
+End Sub
+
+' Sharing code
+'-——————————————————————————————————————————————————————- -- -  -
+
+Sub CheckSharing(vsock As Long) ' : AddStack "Sharing_CheckSharing(" & vsock & ")"
+  'Only the connecting bot requests sharing
+  If DCCSocks(vsock).PortNum = 0 Then Exit Sub
+  'Store sharing settings in FileName and CurrentQuestion (well, they're unused ;))
+  'FileName stores all infos that must be shared
+  'CurrentQuestion contains the current sharing request
+  DCCSocks(vsock).FileName = GetUserData(DCCSocks(vsock).UserNum, "sharing", "")
+  If DCCSocks(vsock).FileName <> "" Then
+    DCCSocks(vsock).CurrentQuestion = ParamX(DCCSocks(vsock).FileName, ",", 1)
+    TU vsock, "s type " + DCCSocks(vsock).CurrentQuestion
+  End If
+End Sub
+
+'Handle a sharing message ("s ....") received from botnet
+Sub SharingMessage(vsock As Long, Line As String) ' : AddStack "Sharing_SharingMessage(" & vsock & ", " & Line & ")"
+Dim SearchType As String, ShareThis As String
+  Select Case Param(Line, 2)
+    Case "type"
+      Select Case Param(Line, 3)
+        Case "full"
+          Select Case Param(Line, 4)
+            Case "1": SearchType = "full 2"
+            Case "2": SearchType = "full 1"
+            Case "3": SearchType = "full 4"
+            Case "4": SearchType = "full 3"
+            Case Else: RTU vsock, "s un Sorry, I don't understand your request.": Exit Sub
+          End Select
+          ShareThis = GetListEntry(DCCSocks(vsock).CurrentQuestion, ",", SearchType)
+          If ShareThis <> "" Then
+            DCCSocks(vsock).CurrentQuestion = ShareThis
+            RTU vsock, "s ok"
+            Select Case Param(DCCSocks(vsock).CurrentQuestion, 2)
+              Case "1"
+                SpreadFlagMessage 0, "+t", "14*** Botnet: Overwriting " + DCCSocks(vsock).RegNick + "'s userfile with mine..."
+                SharingSendUserfile vsock
+                RTU vsock, "s done"
+              Case "2"
+                SpreadFlagMessage 0, "+t", "14*** Botnet: " + DCCSocks(vsock).RegNick + " is overwriting my userfile..."
+              Case "3"
+                SpreadFlagMessage 0, "+t", "14*** Botnet: Receiving " + DCCSocks(vsock).RegNick + "'s userfile..."
+              Case "4"
+                SpreadFlagMessage 0, "+t", "14*** Botnet: Sending my userfile to " + DCCSocks(vsock).RegNick + "..."
+                SharingSendUserfile vsock
+                RTU vsock, "s req"
+            End Select
+          Else
+            If GetListEntry(DCCSocks(vsock).CurrentQuestion, ",", "full") = "" Then
+              RTU vsock, "s un I'm not configured for full sharing with you."
+            Else
+              RTU vsock, "s un Our full sharing types don't match."
+            End If
+          End If
+          RTU vsock, "s un Sorry, I don't understand your request."
+        Case "chan"
+        Case Else
+          RTU vsock, "s un Sorry, I don't understand your request."
+      End Select
+    Case "+u"
+    Case "p"
+    Case "+h"
+    Case "d"
+    Case Else
+      RTU vsock, "s un Sorry, I don't understand your request."
+  End Select
+End Sub
+
+Sub SharingSendUserfile(vsock As Long) ' : AddStack "Sharing_SharingSendUserfile(" & vsock & ")"
+Dim u As Long
+  For u = 1 To BotUserCount
+    RTU vsock, "s +u " + BotUsers(u).Name + " " + CombineAllFlags(u)
+    RTU vsock, "s p " + BotUsers(u).Name + " " + BotUsers(u).Password
+    If BotUsers(u).HostMaskCount > 0 Then RTU vsock, "s +h " + BotUsers(u).Name + " " + CombineAllHosts(u)
+    If BotUsers(u).UserData <> "" Then RTU vsock, "s d " + BotUsers(u).Name + " " + BotUsers(u).UserData
+  Next u
+End Sub

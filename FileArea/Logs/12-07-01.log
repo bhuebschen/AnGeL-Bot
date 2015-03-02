@@ -1,0 +1,32 @@
+[01:32:26] ¸+*°´^`°*+-> AnGeL V1.6.2 BETA10 Startup <-+*°´^`°*+¸
+[01:32:26] |  Read language file.
+[01:32:26] |  Read policy file.
+[01:32:26] |  Read userlist - 2 users.
+[01:32:26] |  Initialized help system - 123 entries.
+[01:32:26] |  Read 0 ignores.
+[01:32:26] |  Read 1 ban.
+[01:32:26] |  Read 0 excepts.
+[01:32:26] |  Read 0 invites.
+[01:32:26] |  Read 0 notes.
+[01:32:26] |  Added tray icon.
+[01:32:26] |  Hooked to Winsock.
+[01:32:26] |  Listening for telnet connects on port 60023 (vSocket: 2).
+[01:32:26] |  Listening for Botnet connects on port 63333 (vSocket: 3).
+[01:32:26] |  Initialized botnet.
+[01:32:26] |  Started timers.
+[01:32:26] |  -=- HLSW v1.0 online! (VSock 4)
+[01:32:26] |  *** Cant use PerlScript - Be sure everything installed.
+[01:32:26] |  *** LoadScript failed (scripts are disabled)
+[01:32:26] |  Loaded scripts: 2
+[01:32:26] |  Started Uptime Contest.
+[01:32:26] |  Initialisation complete. Bot started.
+[01:32:26] `·--- Startup complete. ----------------------- ----- --  -
+[01:32:38] ¸.--- Unloading Bot ---------------------------------------------------- ----- --  -
+[01:32:38] |  Removed scripts.
+[01:32:38] |  *** Bot winsock2_shutdown initiated (closed by host)
+[01:32:38] |  *** Thank you for using an AnGeL Bot! C-Ya!
+[01:32:38] |  
+[01:32:38] |  Bot is being closed by host!
+[01:32:38] |  Removed tray icon.
+[01:32:38] |  Unhooked from Winsock.
+[01:32:38] `·--- Good bye. ---------------------------------------------------------- ----- --  -

@@ -1,0 +1,162 @@
+-=- AnGeL -=-
+
+Getan:
+- NT Service Handler upgedated.
+- Helper/HalfOp support
+- NetSetup erweitert/fehlerbereinigt
+- Hook Chan_ctcp(Nick, RegNick, Channel, Line)
+- Hook Chan_notice(Nick, RegNick, Channel, Line)
+- Hook Priv_notice(Nick, RegNick, Line)
+- Hook Server_notice(Server, Target, Line)
+- Hook KI 'erweitert', neuer Syntax = Sub KI(Nick, Line), wobei Nick den angesprochenen Namen beinhaltet und Line die Zeile die der Bot antworten würde. Wer langeweile hat, kann also z.B. in 
+- Hook RAW 'erweitert'. Man kann nun bestimmte Events 'RAW' hooken. Zum Beispiel: Hook "raw join part quit 001" würde RAW nur noch bei eben diesen Events auslösen. Alternativ kann man auch mehrmals hintereinander Hook "RAW <parameter>" auslösen um spezielle Ereignisse zu hooken.
+- .cb bzw. .chanbans - Auflisten der Bans in einem Channel
+- Channel Limit dynamisch gemacht. Man kann nun theoretisch in über 32000 Channels joinen.
+- Ban, Invite und Except Limit je von 50 auf 'dynamisch' umgestellt.
+- psyBNC fix (es ist nun ohne zusätzliches script möglich zu einem psybnc zu connecten, ohne das die flood protection stehenbleibt)
+- FirstTimeKeyword Routine überarbeitet. Bot meldet nun bei einem Fehler was passiert ist UND löscht das KeyWord erst bei erfolgreichem Eintrag.
+Verbindung mit Hook Priv_msg ein Query-Log anlegen :).
+- UserSharing. Bots können UserFiles sharen. Dazu gibt es das neue BotFlag +s. Hinweis: Die Bots MIXEN ihre Settings beim connecten miteinander. Kann einen wahren Sharing BURST auslösen wenn viele Bots geshared werden. Weitergeleitete (gesharete) Befehle sind: .chattr .adduser .remuser .-bot .+bot .botattr .+host .-host .+user .-user .comment
+- Partyline Befehl .cycle bzw. .rejoin, verlässt den Bot einen Channel für 5 Sekunden zu verlassen.
+- Partyline Befehl .reload bzw. .rescript, lädt ein script neu.
+- .status gibt in der Liste nun nicht mehr 'nur' aus ob Op oder nicht sondern zeigt explizit den eigenen Status an (Oper, HalfOp, Voice, User) und ob der Bot als NT Service oder Anwendung läuft.
+- Die Befehle .botport und .userport wurden aus der Liste gelöscht funktionieren aber. Ports lassen sich nur noch über das BotSetup von SuperOwnern verändern.
+- Der Bot erkennt wenn seine Connection restricted ist (+r) und wechselt bis zu 3 mal den Server. Sollte nach dem 3ten die Connection immernoch restricted sein sendet der Bot eine Flagnote an alle Owner (+n). Außerdem wird der Restricted Status im .status angezeigt. Per BotSetup abschaltbar.
+- Wenn ein Bot linkt, und schon gelinkt zu sein scheint, wird 5 Sekunden 'gewartet' und dann erneut geprüft. Dies soll verhindern das Bots 'abgelehnt' werden bevor ihre unlink Nachricht durch das Botnet kommt. (z.B. bei Lags)
+- Wenn man die Link Adresse eines Bots änderd während dorthin connected wird, wird der Verbindungsaufbau bei .link abgebrochen. Man muss nicht mehr extra .unlink verwenden.
+- Um dem Bot Dateien schicken zu können, muss man sich bei ihm auf der Partyline befinden. Dies ist eine Sicherheitsvorkehrung um 'Fake' Owner abzuwehren.
+- Für Scripts 2 neue File Befehle. FileCopy(file1, file2) sowie FileDelete(file1). Ausgenommen natürlich die Files AnGeL.exe, Update.exe und AnGeL.ini ;)
+- Für Scripts 2 neue 'Is' Befehle. IsHalfOp(Nick,Channel) und IsVoice(Nick,Channel) (funktionieren wie IsOp)
+- Man kann im BotSetup nun einstellen nach wievielen Tagen die Logs automatisch gelöscht werden (Log History). Standard ist 30.
+- Botnet 'Trace' wird durchgeroutet UND verarbeitet. Somit sollten EggDrops nun wunderbar tracen können *G*
+- .trace führt einen Botnet Trace durch
+- +q und +a User (* und !) werden wie +o behandelt, statt wie bisher wie User.
+- AUTH-Support. Man kann per .authsetup nun einstellen bei wem bzw. ob und wie der Bot sich AUTH´en soll.
+- DCC Portrange einstellbar für mehr Firewall Kompabilität.
+- Command Prefix (! Bei !seen) konfigurierbar.
+- KI Setup hinzugefügt. Damit das Engelchen sich seinen Vornamen merkt :)
+- psyBNC Bug mit DCCs gefixed.
+- VB5<->VB6 Prev. Instance bug gefixed.
+- Telnet Server 1.2. (Mit erweiterter Farbunterstützung zur besseren Darstellung und DCC Support)
+- Notices an den Bot (z.B. reply von NickServ) werden auf der Partyline angezeigt (wie PRIVMSGs)
+- Mit .fwd - Kann man eine Note-Weiterleitung einrichten. Somit ist es möglich auf jedem Bot seine Notes auf einen Zentralen Hauptbot forwarden zu lassen.
+- Botnet Broadcasts (z.B. von EggDrops mit Gseen) werden nun durchgeroutet.
+- Die Bots tauschen nun falls sie sich nicht mehr erkennen über das BotNet ihre Hostmask aus.
+- .restart funktioniert nun mit JEDEM dateinamen :)
+- MOTD Bug entfernt.
+- telnet connections zu *!telnet@host... um sie ignoren zu können
+- .chattr unterstützt nun mehrere Attribute hinternander, durch ein | getrennt, z.B. : .chattr Admin +x|+y #chan
+- BotSetup erweiterts/repariert (Eintrag 18 nun HideBot und net LogParty)
+- Seen-Bug mit Sonderzeichen entfernt. (Sorry, there's an error in the seen list - file is too long.)
+- DCC Queue ist nun maximum von 30 Dateien. Man kann zudem mit viewqueue und clearqueue die Liste anzeigen bzw. leeren und mit abort einzelne dateien aus der liste nehmen.
+- Der FileArea Befehl 'get' unterstützt nun ein optinales feld mit einem Nickname dem die Dateien geschickt werden sollen. Bei einer Telnet Session ist diese Angabe Pflicht.
+- Die Partyline erkennt nun automatisch welcher befehl abgekürzt wurde. z.B. ist .chat dann gleichbedeutend mit .chattr bzw. .chad mit .chaddr.
+- .relay nun hardcodet drinnen und erweitert so das es bei AnGeL Telnet Servern ab 1.2 'DCC-Mode' aktiviert, ansonsten ANSI Codes -> IRC codes convertiert.
+- BotFlags +i (isolate partyline) und +r (reject link)
+- Neuer Befehl .sharecmd um Befehle an alle sharing Partner (lokale Bots mit +s BotFlag) weiterzusenden
+- Diverse Endlosschleifen bzw. 100% loops entfernt.
+- Den 0x01 Bug exploit gefixed.
+- .dccstat gefixed
+- doppelte comments entfernt
+- URLs gefixed
+- Zwei neue Script Befehle zum Abfragen der BanList. 'ChanBan(ChNum, Nr)' und 'ChanBanCount(ChNum)'
+- Zwei neue Hooks zum Abfragen von Bans. Hook 'Ban' und 'UnBan'.
+- AnGeL kann nun UDP. Dazu öffnet man einen UDP Port mit SockOpenUDP(Port, ReplySub). Senden tut man mit SockWriteUDP(VSock,Host,Port,Data). Geschlossen wird der Socket mit SockClose. Hinweis: Neue ReplySub Sub SockEventUDP(vsock, event, Host, Port, What). Es gibt nur SE_READ und SE_CLOSE
+- ScriptEngine kann IIf und
+- Es ist möglich ganze Sektionen aus einem INI File zu löschen. Hierzu DeleteINISection(section, file)
+- Traffic Graph eingebaut. Dieser zeigt eine grafische Darstellung der letzten 24 Stunden, sowie Gesamt-Traffic für aktuelle Session und insgesamt.
+- Das Netsetup kann man nun automatisch updaten lassen (per botsetup umstellbar)
+- Es ist nun möglich per DCC CHAT auf den Telnet Port zu connecten. (/dcc chat <ip>:<port>)
+- IdentD per botsetup abschaltbar
+- AnGeL nimmt ab sofort am IRC Bot Uptime Contest teil
+- .+chan akzeptiert nun auch chan keys.
+- neues notes format
+- !include "filename"! - in Scripts, veranlasst AnGeL ein filename.inc an den script anzuhängen.
+- diverse 'bugfixes' am server socket
+- verschiedene befehle halfop optimiert
+- ein loop in der split detection beseitigt
+- ein bug in der unban routine entfernt
+- script engine nun SICHER
+- Script Variable 'CommandPrefix' ermöglicht es Scripts sich dynamischer an das BotSetup anzupassen.
+- AnGeL komprimiert nun auf NTFS Platten das Logs und das Scripts Verzeichniss
+- Router-Fix eingebaut.
+- .check 'bugfixed'
+- AnGeL setzt die eigene priorität nun auf 'niedriger als normal'.
+- AnGeL kann NTFS Verschlüsselung.
+- Scripting Engine benutzt nun RunScriptX (Sprich es könnten nun auch andere Sprachen benutzt werden.).
+- Policy Setup (bereinigt).
+- Schreibfehler im BotSetup entfernt.
+- Default Channel Settings hinzugefügt (.cs default)
+- BanMask zu Channel Settings hinzugefügt.
+
+
+Whatsnew
+Added 'Srv_Connect'/'fa_command'/'fa_userjoin'/'fa_userleft'/'fa_downloadbegin'/'fa_downloadcomplete'/'fa_uploadbegin'/'fa_uploadcomplete'/'seen'/'KI' hook
+
+
+
+Für Haruka:
+Sub Mode(Nick,RegNick,Chan, Line)
+Sub Chan_CTCP(Nick, RegNick, Channel, Line)
+Sub Chan_Notice(Nick, RegNick, Channel, Line)
+Sub Priv_Notice(Nick, RegNick, Line)
+Sub Server_Notice(Server, Target, Line)
+Sub KI(Nick, Line)
+Sub Ban(Nick, RegNick, Chan, Mask)
+Sub UnBan(Nick, RegNick, Chan, Mask)
+Sub SockEventUDP(vsock, event, Host, Port, What)
+	event(2) = SE_READ
+	event(3) = SE_CLOSE
+
+FileCopy quelle, ziel
+FileDelete datei
+IsHalfOp(Nick,Channel)
+IsVoice(Nick,Channel)
+ChanBan(ChNum, Nr)
+ChanBanCount(ChNum)
+SockOpenUDP(Port, ReplyToSub)
+SockWriteUDP(vsock, Host, Port, What)
+DeleteINISection(Section, Name)
+
+
+Zutun:
+- Service Installer erweitern das er den Angel nach einem Absturz neustartet! (60 Sekunden 'Pause'. Falls BotUpdate) und Beschreibung auf BotName updaten ;)
+- chanflag unbekannte bans zu removen
+- .match überarbeiten
+- multiple partyline channels
+- partyline verlassen aber auch bot bleiben
+- .strip - partyline text 'filtern'
+[00:17:30] <Chichiri> <|Tifa|> ###  strip [modes]
+[00:17:30] <Chichiri> <|Tifa|>    enables you to remove embedded 'attribute' codes from within a
+[00:17:30] <Chichiri> <|Tifa|>    section of text. Valid options are:
+[00:17:30] <Chichiri> <|Tifa|>       b  remove all boldface codes
+[00:17:30] <Chichiri> <|Tifa|>       c  remove all color codes
+[00:17:31] <Chichiri> <|Tifa|>       r  remove all reverse video codes
+[00:17:33] <Chichiri> <|Tifa|>       u  remove all underline codes
+[00:17:35] <Chichiri> <|Tifa|>       a  remove all ansi codes
+[00:17:40] <Chichiri> <|Tifa|>       g  remove all ctrl-g (bell) codes
+[00:17:42] <Chichiri> <|Tifa|>    the mode can also be a modifier like '+c' or '-bu' or '+ru-c'.  if
+[00:17:44] <Chichiri> <|Tifa|>    you omit modes, it will show your current setting.
+[00:17:46] <Chichiri> <|Tifa|> ###  strip <user> [modes]
+[00:17:48] <Chichiri> <|Tifa|>    is used to set the strip level of another user, a master can't
+[00:17:50] <Chichiri> <|Tifa|>    set their own strip flags without starting the modes with a +/-
+[00:17:53] <Chichiri> filtert auch partyline chat
+
+- .page - warte taste für telnet
+[00:23:14] <Chichiri> aber manchmal isses doch nützlich
+[00:23:29] <Chichiri> <|Tifa|> ### page <# or off>
+[00:23:29] <Chichiri> <|Tifa|>      allows you to slow down the number of lines the bot sends to you
+[00:23:29] <Chichiri> <|Tifa|>      at once while you're in chat mode.  with this on, any commands
+[00:23:29] <Chichiri> <|Tifa|>      that send greater than the specified number of lines will stop
+[00:23:29] <Chichiri> <|Tifa|>      when the number is reached, and wait for you to type another
+[00:23:29] <Chichiri> <|Tifa|>      command (or press enter) to continue. if you have to many
+[00:23:31] <Chichiri> <|Tifa|>      lines waiting to be seen you may be booted off the bot.
+
+- ActiveTCL Support!
+- .update erweitern das man eine url angeben kann von der das file gesaugt wird
+- filearea befehl um dateien von urls zu saugen
+- Seen Routine erweitern so das sie auch im BotNet fragt
+
+.-=-. Remarks .-=-.
+'A10' - To be tested...
+'B10' - To be added...

@@ -1,0 +1,67 @@
+      -={ Baum }=-
+-Sockets
+  -vSockets
+  -WinSock2
+  -DNS
+
+-Scripting
+  -Scripts
+  -Addins
+  -ScriptCommands
+
+-Userlist
+  -BotUserlist
+  -OnlineUserlist
+
+-Botnet
+  -BotTree
+  -Modules (GetOps etc.)
+
+-GUI
+  -Window
+  -TrayIcon
+  -Setup
+  -XP Manifest
+
+-Partyline
+  -Help
+  -Language
+  -Logs
+  -Console
+  -FileArea
+
+-OpSys
+  -NTService
+  -ThreadPriority
+  -Windows Information
+  -TickCount
+  -ExceptionFilter
+
+-TimedEvents
+  -Events
+  -Orders
+
+-FileSys
+  -NTFS Features
+  -vFiles
+
+-Server
+  -IRC Parser
+  -Channels
+  -FloodProtection
+  -OnlineUsers
+
+-Plugins
+  -Notes
+  -Whatis
+  -KI
+  -Uptime
+
+-={ Noch nicht eingeordnet.. }=-
+-Notes (obsolete?)
+-VoiceMessages
+-Sharing (muss dringend überarbeitet werden)
+-KI (nc ;))
+-TrafficMod (evtl. Sockets)
+-UptimeMod (evtl. OpSys)
+-TrafficMonitor (evtl. GUI)

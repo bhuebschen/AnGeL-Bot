@@ -1,0 +1,224 @@
+Option Explicit
+' Sharing code
+'-——————————————————————————————————————————————————————- -- -  -
+
+Sub CheckSharing(vsock As Long)
+  'Only the connecting bot requests sharing
+  If DCCSocks(vsock).PortNum = 0 Then Exit Sub
+  'Check BotFlags for sharing Flags and send request if so. Attach channels if specified
+  If MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+s") Then
+    TU vsock, "s type 3 " & GetUserData(DCCSocks(vsock).UserNum, "sharing", "*")
+  ElseIf MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+S") Then
+    TU vsock, "s type 1 " & GetUserData(DCCSocks(vsock).UserNum, "sharing", "*")
+  ElseIf MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+m") Then
+    TU vsock, "s type 4 " & GetUserData(DCCSocks(vsock).UserNum, "sharing", "*")
+  ElseIf MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+M") Then
+    TU vsock, "s type 2 " & GetUserData(DCCSocks(vsock).UserNum, "sharing", "*")
+  End If
+End Sub
+
+'Handle a sharing message ("s ....") received from botnet
+Sub SharingMessage(vsock As Long, Line As String)
+  Dim ShareRange As String
+  Dim ShouldRange As String
+  Select Case Param(Line, 2)
+    Case "type"
+      ShareRange = LCase(Param(Line, 4))
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      Select Case Param(Line, 3)
+        Case "1" '+M
+          If MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+M") And ShareRange = ShouldRange Then
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Receiving " + DCCSocks(vsock).RegNick + "'s userfile..."
+            RTU vsock, "s ok rcv " & ShouldRange
+          Else
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, type or range mismatch..."
+            RTU vsock, "s un Sorry, type or range mismatch."
+          End If
+        Case "2" '+S
+          If MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+S") And ShareRange = ShouldRange Then
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Overwriting " + DCCSocks(vsock).RegNick + "'s userfile..."
+            RTU vsock, "s ok snd " & ShouldRange
+            SharingSendUserfile vsock, ShouldRange
+          Else
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, type or range mismatch..."
+            RTU vsock, "s un Sorry, type or range mismatch."
+          End If
+        Case "3" '+m
+          If MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+m") And ShareRange = ShouldRange Then
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Mixing with " + DCCSocks(vsock).RegNick + "'s userfile, checking local..."
+            RTU vsock, "s ok mxs " & ShouldRange
+            SharingSendUserfile vsock, ShouldRange
+          Else
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, type or range mismatch..."
+            RTU vsock, "s un Sorry, type or range mismatch."
+          End If
+        Case "4" 'it +s, me +m
+          If MatchFlags(BotUsers(DCCSocks(vsock).UserNum).BotFlags, "+s") And ShareRange = ShouldRange Then
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Mixing with " + DCCSocks(vsock).RegNick + "'s userfile, checking remote..."
+            RTU vsock, "s ok mxr " & ShouldRange
+          Else
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, type or range mismatch..."
+            RTU vsock, "s un Sorry, type or range mismatch."
+          End If
+        Case Else
+          RTU vsock, "s un Sorry, I don't understand your request."
+          SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, unknown type..."
+      End Select
+    Case "ok"
+      ShareRange = LCase(Param(Line, 4))
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      Select Case Param(Line, 3)
+        Case "rcv"
+          If ShareRange = ShouldRange Then
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Overwriting " + DCCSocks(vsock).RegNick + "'s userfile..."
+            RTU vsock, "s ok snd " & ShouldRange
+            SharingSendUserfile vsock, ShouldRange
+          Else
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, type or range mismatch..."
+            RTU vsock, "s un Sorry, type or range mismatch."
+          End If
+        Case "snd"
+          If ShareRange = ShouldRange Then
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Receiving " + DCCSocks(vsock).RegNick + "'s userfile..."
+            DCCSocks(vsock).FileName = "userlist.txt"
+            DCCSocks(vsock).CurrentQuestion = ShouldRange
+          Else
+            SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, type or range mismatch..."
+            RTU vsock, "s un Sorry, type or range mismatch."
+          End If
+        Case "mxr"
+          Beep
+        Case "mxs"
+          Beep
+        Case Else
+          RTU vsock, "s un Sorry, I don't understand your request."
+          SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, unknown type..."
+      End Select
+    Case "ul" ' Userlist
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange Then
+        SharingGotUserlist vsock, Param(Line, 3)
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "+u" ' Adduser
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange And ParamCount(Line) = 3 Then
+        SharingGotAdduser vsock, Param(Line, 3), DCCSocks(vsock).RegNick
+      ElseIf DCCSocks(vsock).FileName = "sharing" And ShareRange = ShouldRange And ParamCount(Line) = 4 Then
+        SharingGotAdduser vsock, Param(Line, 3), Param(Line, 4)
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "sp" ' SetPassword
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange And ParamCount(Line) = 4 Then
+        SharingGotSetPassword vsock, Param(Line, 3), Param(Line, 4), DCCSocks(vsock).RegNick
+      ElseIf DCCSocks(vsock).FileName = "sharing" And ShareRange = ShouldRange And ParamCount(Line) = 5 Then
+        SharingGotSetPassword vsock, Param(Line, 3), Param(Line, 4), Param(Line, 5)
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "sf" ' SetFlags
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange And ParamCount(Line) >= 4 Then
+        SharingGotSetFlags vsock, Param(Line, 3), DCCSocks(vsock).RegNick, GetRest(Line, 4)
+      ElseIf DCCSocks(vsock).FileName = "sharing" And ShareRange = ShouldRange And ParamCount(Line) >= 5 Then
+        SharingGotSetFlags vsock, Param(Line, 3), Param(Line, 4), GetRest(Line, 5)
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "sh" ' SetHosts
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange And ParamCount(Line) >= 4 Then
+        SharingGotSetHosts vsock, Param(Line, 3), DCCSocks(vsock).RegNick, GetRest(Line, 4)
+      ElseIf DCCSocks(vsock).FileName = "sharing" And ShareRange = ShouldRange And ParamCount(Line) >= 5 Then
+        SharingGotSetHosts vsock, Param(Line, 3), Param(Line, 4), GetRest(Line, 5)
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "sd" ' SetUserdata
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange And ParamCount(Line) >= 4 Then
+        SharingGotSetUserdata vsock, Param(Line, 3), DCCSocks(vsock).RegNick, GetRest(Line, 4)
+      ElseIf DCCSocks(vsock).FileName = "sharing" And ShareRange = ShouldRange And ParamCount(Line) >= 5 Then
+        SharingGotSetUserdata vsock, Param(Line, 3), Param(Line, 4), GetRest(Line, 5)
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "eof" ' EndOfFile
+      ShareRange = LCase(DCCSocks(vsock).CurrentQuestion)
+      ShouldRange = LCase(Param(Line, 3))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange Then
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Received " + DCCSocks(vsock).RegNick + "'s userfile..."
+        RTU vsock, "s ack " & ShouldRange
+        DCCSocks(vsock).FileName = "sharing"
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "ack"
+      ShareRange = LCase(Param(Line, 3))
+      ShouldRange = LCase(GetUserData(DCCSocks(vsock).UserNum, "sharing", "*"))
+      If DCCSocks(vsock).FileName = "userlist.txt" And ShareRange = ShouldRange Then
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Finished " + DCCSocks(vsock).RegNick + "'s userfile..."
+        DCCSocks(vsock).FileName = "sharing"
+      Else
+        RTU vsock, "s un Fake request?"
+        SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, Fake?..."
+      End If
+    Case "un"
+      SpreadFlagMessage 0, "+t", "14*** Sharing: " + DCCSocks(vsock).RegNick + " rejected request: " & GetRest(Line, 3)
+    Case Else
+      RTU vsock, "s un Sorry, I don't understand your request."
+      SpreadFlagMessage 0, "+t", "14*** Sharing: Rejecting " + DCCSocks(vsock).RegNick + "'s sharing request, unknown type..."
+  End Select
+End Sub
+
+Sub SharingSendUserfile(vsock As Long, Range As String)
+  DCCSocks(vsock).FileName = "userlist.txt"
+'  Dim u As Long
+'  For u = 1 To BotUserCount
+'    RTU vsock, "s +u " + BotUsers(u).Name + " " + CombineAllFlags(u)
+'    RTU vsock, "s p " + BotUsers(u).Name + " " + BotUsers(u).Password
+'    If BotUsers(u).HostMaskCount > 0 Then RTU vsock, "s +h " + BotUsers(u).Name + " " + CombineAllHosts(u)
+'    If BotUsers(u).UserData <> "" Then RTU vsock, "s d " + BotUsers(u).Name + " " + BotUsers(u).UserData
+'  Next u
+  RTU vsock, "s eof " & Range
+End Sub
+
+Sub SharingGotUserlist(vsock As Long, Userlist As String)
+  Beep
+End Sub
+
+Sub SharingGotAdduser(vsock As Long, Username As String, WhoAdded As String)
+  Beep
+End Sub
+
+Sub SharingGotSetPassword(vsock As Long, Username As String, NewPassword As String, WhoSet As String)
+  Beep
+End Sub
+
+Sub SharingGotSetFlags(vsock As Long, Username As String, WhoSet As String, NewFlags As String)
+  Beep
+End Sub
+
+Sub SharingGotSetHosts(vsock As Long, Username As String, WhoSet As String, NewHosts As String)
+  Beep
+End Sub
+
+Sub SharingGotSetUserdata(vsock As Long, Username As String, WhoSet As String, NewUserdata As String)
+  Beep
+End Sub
