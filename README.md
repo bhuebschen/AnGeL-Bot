@@ -69,7 +69,7 @@ AnGeL-Bot wurde in zahlreichen deutschsprachigen IRC-Communities verwendet und s
 - https://web.archive.org/web/20060203232521/http://mercurys.fmo-clan.de:80/angelbot/
 - https://web.archive.org/web/20140328225234/http://www.angelbot-portal.de/
 - https://www.vbarchiv.net/forum/id14_i4899t4899_altes-projekt-in-vb6-angel-bot-fuers-irc-mit-problemchens.html
-- https://wp.xin.at/archives/4343
+- http://wp.xin.at/archives/4343
 
 ## Lizenz
 
