@@ -78,4 +78,5 @@ GPLv3 – siehe [LICENSE.md](https://github.com/bhuebschen/AnGeL-Bot/blob/main/L
 ## Wikipedia
 
 Durch offenbar fehlende Erwähnung in Fachzeitschriften und herabsetzung der Seriösistät anderer Quellen, hat es der AnGeL-Bot leider nicht in die Wikipedia geschafft
-https://de.wikipedia.org/wiki/Wikipedia:L%C3%B6schkandidaten/12._Mai_2025#AnGeL-Bot
+[https://de.wikipedia.org/wiki/Wikipedia:L%C3%B6schkandidaten/12._Mai_2025#AnGeL-Bot
+](https://de.wikipedia.org/wiki/Wikipedia:L%C3%B6schkandidaten/12._Mai_2025#AnGeL-Bot_(gel%C3%B6scht))
